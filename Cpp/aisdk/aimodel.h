@@ -53,7 +53,7 @@ class AiModel{
 
 #define _ONNX_
 #ifdef _ONNX_
-#include "onnxruntime/onnxruntime_cxx_api.h"
+#include "onnx/onnxruntime_cxx_api.h"
 class OnnxModel:public AiModel{
     protected:
         int m_batch = 0;
@@ -73,7 +73,7 @@ class OnnxModel:public AiModel{
 
 #define _NCNN_
 #ifdef _NCNN_
-#include "ncnn/ncnn/net.h"
+#include "net.h"
 class NcnnModel:public AiModel{
     protected:
         int m_width = 160;

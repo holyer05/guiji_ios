@@ -4,6 +4,7 @@
 #include "wavreader.h"
 
 
+
 int KWav::initbuf(int pcmsample){
 	m_pcmsample = pcmsample;
 	m_wavsample = pcmsample + 2*MFCC_OFFSET;
@@ -131,7 +132,7 @@ int KWav::loadfn(const char* wavfile){
 }
 */
 
-KWav::KWav(const char* filename,MBnfCache* bnfcache,float duration){
+KWav::KWav(const char* filename,MBnfCache* bnfcache){
     m_bnfcache = bnfcache;
     std::string wavfile(filename);
     int format, channels, sr, bits_per_sample;
@@ -142,10 +143,6 @@ KWav::KWav(const char* filename,MBnfCache* bnfcache,float duration){
         return;
     }
     int res = wav_get_header(fhnd, &format, &channels, &sr, &bits_per_sample, &data_length);
-    if(duration>0)
-    {
-        data_length=duration*(channels *bits_per_sample*sr/8);
-    }
     if(data_length<1) {
         m_duration = 0;
         return;

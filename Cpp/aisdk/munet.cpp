@@ -1,5 +1,5 @@
 #include "munet.h"
-#include "ncnn/ncnn/cpu.h"
+#include "cpu.h"
 #include "face_utils.h"
 #include "blendgram.h"
 
@@ -21,9 +21,9 @@ int Mobunet::initModel(const char* binfn,const char* paramfn,const char* mskfn){
     unet.clear();
     //ncnn::set_cpu_powersave(2);
     //ncnn::set_omp_num_threads(ncnn::get_big_cpu_count());
-    unet.opt = ncnn::Option();
+    //unet.opt = ncnn::Option();
     //unet.opt.use_vulkan_compute = true;
-    unet.opt.num_threads =1;// ncnn::get_big_cpu_count();
+    unet.opt.num_threads = ncnn::get_big_cpu_count();
     //unet.load_param("model/mobileunet_v5_wenet_sim.param");
     //unet.load_model("model/mobileunet_v5_wenet_sim.bin");
     unet.load_param(paramfn);
@@ -132,30 +132,16 @@ int Mobunet::domodel(JMat* pic,JMat* msk,JMat* feat){
     ncnn::Mat inwenet(256,20,1,feat->data());
     //ncnn::Mat inwenet(20,256,1,feat->data());
     ncnn::Mat outpic;
-    
     ncnn::Extractor ex = unet.create_extractor();
-
-    ex.set_num_threads(1);
     ex.input("face", inpic);
     ex.input("audio", inwenet);
     ex.extract("output", outpic);
-
     float outmean_vals[3] = {-1.0f, -1.0f, -1.0f};
     float outnorm_vals[3] = { 127.5f,  127.5f,  127.5f};
     outpic.substract_mean_normalize(outmean_vals, outnorm_vals);
     cv::Mat cvout(160,160,CV_8UC3);
     outpic.to_pixels(cvout.data,ncnn::Mat::PIXEL_RGB2BGR);
     BlendGramAlpha((uchar*)cvout.data,(uchar*)mat_weights->data(),(uchar*)pic->data(),160,160);
-    
-//    ex.clear();
-//    inmask.release();
-//    inreal.release();
-//    inpic.release();
-//    buf=nullptr;
-//    pr=nullptr;
-//    pm=nullptr;
-//    inwenet.release();
-//    outpic.release();
     //pic->tojpg("fff.bmp");
     //getchar();
     /*

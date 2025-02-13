@@ -156,6 +156,7 @@ OnnxModel::~OnnxModel(){
 int OnnxModel::doInitModel(){
     env = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, "ONNX");
     sessionOptions = Ort::SessionOptions();
+    //sessionOptions.AddConfigEntry("session.load_model_format","ORT");
     //std::vector<std::string> availableProviders = Ort::GetAvailableProviders();
     //auto cudaAvailable = std::find(availableProviders.begin(), availableProviders.end(), "CUDAExecutionProvider");
     //OrtCUDAProviderOptions cudaOption;
@@ -166,14 +167,6 @@ int OnnxModel::doInitModel(){
     //}else{
         //std::cout << "Inference device: CPU" << std::endl;
     //}
-    sessionOptions.SetIntraOpNumThreads(1);
-    sessionOptions.SetInterOpNumThreads(1);
-
-    
-//    sessionOptions.AddConfigEntry("session.load_model_format", "ORT");
-    sessionOptions.AddConfigEntry("session.disable_prepacking", "1");
- 
-  //  sessionOptions.AddConfigEntry("session.use_ort_model_bytes_directly", "1");
 
     session = Ort::Session(env, m_modelPath.c_str(), sessionOptions);
     //Ort::AllocatorWithDefaultOptions allocator;

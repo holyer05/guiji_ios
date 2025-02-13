@@ -1,6 +1,6 @@
 #pragma once
 #include "jmat.h"
-#include "ncnn/ncnn/net.h"
+#include "net.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

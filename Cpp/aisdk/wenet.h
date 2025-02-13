@@ -14,7 +14,7 @@ class Wenet{
         int calcmfcc(float* fwav,float* mel2);
         int calcbnf(float* melbin,int melnum,float* bnfbin,int bnfnum);
         //int nextwav(const char* wavfile,JMat** pmat);
-        int nextwav(const char* wavfile,MBnfCache* bnfcache,float duration);
+        int nextwav(const char* wavfile,MBnfCache* bnfcache);
         float* nextbnf(JMat* bnfmat,int index);
         Wenet(const char* modeldir,const char* modelid);
         Wenet(const char* modelfn);

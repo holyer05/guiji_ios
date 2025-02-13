@@ -4,7 +4,6 @@ extern "C"{
 #pragma pack(push)
 #pragma pack(4)
 
-#pragma pack(pop)
     typedef struct _gpg_hdr {
         char        head[4];
         int         box[4];
@@ -14,6 +13,7 @@ extern "C"{
         uint8_t     channel[4];
         uint8_t     bit[4];
     }gpg_hdr;
+#pragma pack(pop)
 }
 
 
@@ -194,7 +194,7 @@ int JMat::loadjpg(std::string picfile,int flag){
             rst = -15;
             break;
         }
-        m_ref = 0;
+        //m_ref = 0;
         m_bit = 1;
         m_channel = 3;
         m_stride = w*3;
@@ -208,6 +208,7 @@ int JMat::loadjpg(std::string picfile,int flag){
     tjInstance = NULL;
     return rst;
 }
+
 #else
 int JMat::loadjpg(std::string picfile,int flag){
     return -1;
@@ -313,6 +314,7 @@ JMat* JMat::refclone(int ref){
 
 JMat JMat::clone(){
     JMat cm(m_width,m_height,m_channel,m_stride,m_bit);
+    //printf("==clone %d\n",m_size);
     memcpy(cm.m_buf,m_buf,m_size);
     memcpy(cm.m_tagarr,m_tagarr,512*sizeof(int));
     return cm;
@@ -347,7 +349,7 @@ JMat::JMat(std::string picfile,int flag):JBuf(){
     init_tagarr();
 }
 #else
-JMat::JMat(std::string& picfile,int flag):JBuf(){
+JMat::JMat(std::string picfile,int flag):JBuf(){
 
 }
 #endif

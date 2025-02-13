@@ -38,7 +38,7 @@ class KWav{
 		int		initinx();
     public:
         KWav(float duration,MBnfCache* bnfcache);
-        KWav(const char* filename,MBnfCache* bnfcache,float duration);
+        KWav(const char* filename,MBnfCache* bnfcache);
         //KWav(const char* wavfn);
         ~KWav();
 		int pushpcm(uint8_t* pcm,int size);

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory>
+#include <string>
 #include <vector>
 #include <string.h>
 
@@ -18,7 +19,7 @@
 #endif
 
 #ifdef USE_NCNN
-#include "ncnn/ncnn/mat.h"
+#include "mat.h"
 #endif
 
 #ifdef USE_EIGEN

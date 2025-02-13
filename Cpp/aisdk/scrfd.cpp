@@ -1,5 +1,5 @@
 #include "scrfd.h"
-#include "ncnn/ncnn/cpu.h"
+#include "cpu.h"
 
 static int drawface(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects)
 {

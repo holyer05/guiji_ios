@@ -60,7 +60,7 @@ Wenet::~Wenet(){
 }
 
 //int Wenet::nextwav(const char* wavfile,JMat** pmat){
-int Wenet::nextwav(const char* wavfile,MBnfCache* bnfcache,float duration){
+int Wenet::nextwav(const char* wavfile,MBnfCache* bnfcache){
 
     int     m_pcmsample = 0;
     JBuf   *m_pcmbuf = nullptr;
@@ -72,17 +72,12 @@ int Wenet::nextwav(const char* wavfile,MBnfCache* bnfcache,float duration){
     unsigned int data_length;
     void* fhnd = wav_read_open(wavfile);
     if(!fhnd)return -1;
-
     int res = wav_get_header(fhnd, &format, &channels, &sr, &bits_per_sample, &data_length);
-    if(duration>0)
-    {
-        data_length=duration*(channels *bits_per_sample*sr/8);
-    }
     if(data_length<1) {
         wav_read_close(fhnd);
         return -2;
     }
-    LOGD("data len %d\n",data_length);
+    LOGE("data len %d\n",data_length);
     m_pcmbuf = new JBuf(data_length);
     int rst = wav_read_data(fhnd,(unsigned char*)m_pcmbuf->data(),data_length);
     wav_read_close(fhnd);
@@ -101,9 +96,6 @@ int Wenet::nextwav(const char* wavfile,MBnfCache* bnfcache,float duration){
     int melsize = seca*MFCC_MELBASE+mellast;
     int bnfsize = seca*MFCC_BNFBASE+bnflast;
 
-    //printf("===seca %d \n",seca);
-    //getchar();
-    //printf("===wavsample %d \n",wavsample);
     int calcsize = seca+1;
 
     m_wavmat = new JMat(MFCC_WAVCHUNK,calcsize,1);
@@ -120,7 +112,6 @@ int Wenet::nextwav(const char* wavfile,MBnfCache* bnfcache,float duration){
     //m_bnfmat->zeros();
     //
     //printf("===seca %d secb %d mellast %d\n",seca,secb,mellast);
-    //getchar();
     //m_bnfmat = new JMat(
     calcmfcc(m_wavmat,m_melmat);
     float* mel = m_melmat->fdata();
@@ -132,7 +123,9 @@ int Wenet::nextwav(const char* wavfile,MBnfCache* bnfcache,float duration){
         //bnf+=MFCC_BNFBASE*MFCC_BNFCHUNK;
     }
     if(mellast){
-        int inxsec = seca?(seca+1):0;
+        //fix last
+        int inxsec = seca ;//seca?(seca+1):0;
+        printf("===indexsec %d\n",inxsec);
         float* bnf = bnfcache->secBuf(inxsec)->fdata();
         calcbnf(mel,mellast,bnf,bnflast);
         //dumpfloat(bnf,10);

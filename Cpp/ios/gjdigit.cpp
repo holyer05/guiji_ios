@@ -15,7 +15,6 @@
 #include "blendgram.h"
 #include  "wavcache.h"
 #include "aesmain.h"
-#include "netwav.h"
 
 struct gjdigit_s{
     Wenet       *ai_wenet;
@@ -74,38 +73,7 @@ int gjdigit_initMunet(gjdigit_t* dg,char* fnparam,char* fnbin,char* fnmsk){
     return 0;
 }
 
-static int calcinx(gjdigit_t* dg, KWav* wavmat,int index){
-    float* pwav = NULL;
-    float* pmfcc = NULL;
-    float* pbnf = NULL;
-    int melcnt = 0;
-    int bnfcnt = 0;
-    int rst = wavmat->calcbuf(index, &pwav,&pmfcc,&pbnf,&melcnt,&bnfcnt);
-    //LOGE(TAG,"===tooken calcinx %d index %d \n",index,rst);
-    if(rst == index){
-        dg->ai_wenet->calcmfcc(pwav,pmfcc);
-    //double t0 = ncnn::get_current_time();
-        dg->ai_wenet->calcbnf(pmfcc,melcnt,pbnf,bnfcnt);
-    //double t1 = ncnn::get_current_time();
-    //float dist = t1-t0;
-        //dumpfloat(pbnf,10);
-        wavmat->finishone(index);
-    }
-    return 0;
-}
-
-static int calcall(gjdigit_t* dg, KWav* wavmat){
-    int rst =wavmat->readyall();
-    int cnt = 0;
-    while(cnt<1000){
-        rst = wavmat->isready();
-        if(!rst)break;
-        calcinx(dg,wavmat,rst);
-    }
-    return 0;
-}
-
-int gjdigit_onewav(gjdigit_t* dg,const char* wavfn,float duration){
+int gjdigit_onewav(gjdigit_t* dg,const char* wavfn){
     if(!dg->ai_wenet)return -999;
     /*
        if(dg->mat_wenet){
@@ -113,21 +81,10 @@ int gjdigit_onewav(gjdigit_t* dg,const char* wavfn,float duration){
        dg->mat_wenet = NULL;
        }
        */
-
-    int  rst = 0;
-    KWav* net_wavmat = new KWav(wavfn,dg->bnf_cache,duration);
-    if(net_wavmat->duration()>0){
-       calcall(dg,net_wavmat); //
-        rst =  net_wavmat->bnfblocks();//net_curl->checked();
-        dg->cnt_wenet = rst;
-        dg->inx_wenet = 0;
-    }else{
-        rst = dg->ai_wenet->nextwav(wavfn,dg->bnf_cache,duration);
-        dg->bnf_cache->debug();
-        dg->cnt_wenet = rst;
-        dg->inx_wenet = 0;
-    }
-    delete net_wavmat;
+    int rst = dg->ai_wenet->nextwav(wavfn,dg->bnf_cache);
+    dg->bnf_cache->debug();
+    dg->cnt_wenet = rst;
+    dg->inx_wenet = 0;
     return rst;
 }
 
@@ -187,32 +144,6 @@ int gjdigit_matrst(gjdigit_t* dg,uint8_t* buf,int width,int height,int* box,int 
     delete feat;
     return 0;
 }
-
-int gjdigit_simprst(gjdigit_t* dg,uint8_t* bpic,int width,int height,int* box,int index){
-    if(!dg->ai_munet)return -999;
-    //if(!dg->mat_wenet)return -1;
-    if(index<0)return -2;
-    if(index>=dg->cnt_wenet)return -3;
-    dg->bnf_cache->debug();
-    JMat* feat = dg->bnf_cache->inxBuf(index);
-    dg->bnf_cache->debug();
-    //JMat* feat = dg->bnf_cache->inxBuf(0);
-
-    JMat* mat_pic = new JMat(width,height,bpic);
-    MWorkMat wmat(mat_pic,NULL,box);
-    wmat.premunet();
-    JMat* mpic;
-    JMat* mmsk;
-    wmat.munet(&mpic,&mmsk);
-    dg->lock_munet->lock();
-    dg->ai_munet->domodel(mpic, mmsk, feat);
-    dg->lock_munet->unlock();
-    wmat.finmunet(mat_pic);
-    delete mat_pic;
-    delete feat;
-    return 0;
-}
-
 
 int gjdigit_maskrst(gjdigit_t* dg,uint8_t* bpic,int width,int height,int* box,uint8_t* bmsk,uint8_t* bfg,uint8_t* bbg,int index){
     if(!dg->ai_munet)return -999;

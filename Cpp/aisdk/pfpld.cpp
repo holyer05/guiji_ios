@@ -1,5 +1,5 @@
 #include "pfpld.h"
-#include "ncnn/ncnn/cpu.h"
+#include "cpu.h"
 
 
 static int pts68_pfpld(float* arr_pts98,float* arr_pts68){

@@ -170,7 +170,7 @@ int wav_get_header(void* obj, int* format, int* channels, int* sample_rate, int*
 		*sample_rate = wr->sample_rate;
 	if (bits_per_sample)
 		*bits_per_sample = wr->bits_per_sample;
-    printf("==== data subleng %d\n",wr->data_length );
+    printf("==== data left %d byterate %d\n",wr->data_left ,wr->byte_rate);
 	if (data_length)
 		*data_length = wr->data_length;
 	return wr->format && wr->sample_rate;
@@ -193,9 +193,10 @@ int wav_read_data(void* obj, unsigned char* data, unsigned int length) {
 	wr->data_left -= length;
 	return n;
 }
-/*
+#ifdef  WAVTEST
 int main(int argc,char** argv){
-    void* hnd = wav_read_open("../../mybin/errnv.wav");
+    printf("====file %s\n",argv[1]);
+    void* hnd = wav_read_open(argv[1]);
     int format;
     int channels;
     int sample_rate;
@@ -206,4 +207,4 @@ int main(int argc,char** argv){
     return 0;
 
 }
-*/
+#endif
